@@ -1,50 +1,46 @@
-import random
-from hangman_words import words
-from hangman_art import stages, start
+from art import start
+
+alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+            'v', 'w', 'x', 'y', 'z']
+
+again = False
 
 
-stages = stages[::-1]
-lives = 6
-chosen_word = random.choice(words)
-display = ['_' for _ in range(len(chosen_word))]
-guessed_letters = set()
+# TODO-1: Combine the encrypt() and decrypt() into a single function 'caesar()'
+#  Use the value of the user chosen 'direction' variable to determine which functionality to use
+#  Call the caesar function instead of encrypt/decrypt and pass all 3 variables direction/text/shift
+def caesar(encode_or_decode, original_text, shift_amount):
+    cipher_text = ""
 
-print(start)
-
-game = input("Do you wanna play? (y/n): ").lower()
-
-if game == "y":
-    game_over = False
-    while not game_over :
-        print(stages[lives])
-        print(''.join(display))
-        print(f"============Lives left {lives}/6============")
-
-        if lives == 0:
-            game_over = True
-            print(f'The word was: {chosen_word}\n******GAME OVER******')
-            break
-        guess = input("Guess a letter: ").lower()
-        if len(guess) != 1 or not guess.isalpha():
-            print("Please enter a single letter (a–z).")
-            continue
-
-        if guess in guessed_letters:
-            print("You have already guessed that letter")
-            continue
+    if encode_or_decode == "decode":
+        shift_amount *= -1
+    for char in original_text:
+        if char in alphabet:
+            number = alphabet.index(char)
+            index_after_shift = (number + shift_amount) % len(alphabet)
+            cipher_text += alphabet[index_after_shift]
         else:
-            guessed_letters.add(guess)
+            cipher_text += char
 
-        if guess in chosen_word:
-            for i in range(len(chosen_word)):
-                if chosen_word[i] == guess:
-                    display[i] = guess
-        else:
-            print(f"Sorry, {guess} not in the word\nYou lose a life")
-            lives -= 1
+    print(f"Here is the {encode_or_decode}d result: {cipher_text}")
 
-        if '_' not in display:
-            game_over = True
-            print(f"{''.join(display)}\n******You win******")
-else:
-    print("******Thank you for playing******")
+
+
+while not again:
+    print(start)
+    direction = input("Type 'encode' to encrypt, type 'decode' to decrypt:\n ").lower()
+    if direction != "encode" and direction != "decode":
+        print("Invalid direction")
+
+    else:
+        text = input("Type your message:\n ").lower()
+        shift = int(input("Type the shift number:\n "))
+
+        caesar(encode_or_decode=direction, original_text=text, shift_amount=shift)
+
+
+    choice = input("Do you want to continue? (y/n): ").lower()
+
+    if choice == "n":
+        again = True
+        print(f"{start}\nThank you for playing!")
